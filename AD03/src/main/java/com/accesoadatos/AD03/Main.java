@@ -42,7 +42,8 @@ public class Main {
 			ManexoSQLite.desconnetDatabase(con);
 		}
 		 
-		Connection con =  ManexoSQLite.connectDatabase("BaseDeDatos.db"); 
+		Connection con =  ManexoSQLite.connectDatabase("BaseDeDatos.db");
+		ManexoSQLite.vacumm(con);
 		Scanner entrada= new Scanner(System.in);
 		int eleccion;
 		 
@@ -85,25 +86,42 @@ public class Main {
 			ManexoSQLite.printProductos(con);
 			break;
 		case 6:
-	    	 System.out.println("nome da tenda");
-	    	ManexoSQLite.printTendas(con);
-	    	String nometenda=entrada.nextLine();
-			ManexoSQLite.printProductosTenda(con,nometenda);
+			System.out.println("Debe elixir tenda");
+			ManexoSQLite.printTendas(con);
+	     	System.out.println("Inserte  numero da tenda");
+	     	int nTendas=ManexoSQLite.numeroTendas(con);
+	     	String numerotenda=entrada.nextLine();
+	     	String nTen=ManexoSQLite.selectTenda(con,numerotenda);
+			ManexoSQLite.printProductosTenda(con,nTen);
 			break;
 		case 7:
 			ManexoSQLite.anadirProductoTenda(con);
 			break;
 		case 8:
-	    	 System.out.println("nome da tenda");
-	    	ManexoSQLite.printTendas(con);
-	    	String nometenda2=entrada.nextLine();
-	    	ManexoSQLite.actualizarStock(con,nometenda2);
+			System.out.println("Debe elixir tenda");
+			ManexoSQLite.printTendas(con);
+	     	System.out.println("Inserte  numero da tenda");
+	     	int nTendas2=ManexoSQLite.numeroTendas(con);
+	     	String numerotenda2=entrada.nextLine();
+	     	if(Integer.parseInt(numerotenda2)>0 && Integer.parseInt(numerotenda2)<=nTendas2) {
+	     	String nTen2=ManexoSQLite.selectTenda(con,numerotenda2);
+	    	ManexoSQLite.actualizarStock(con,nTen2);
+	     	}else {
+	     		System.out.println("numero erroneo");
+	     	}
 			break;
 		case 9:
-	    	 System.out.println("nome da tenda");
-	    	ManexoSQLite.printTendas(con);
-	    	String nometenda3=entrada.nextLine();
-	    	ManexoSQLite.mostrarStock(con,nometenda3);
+			System.out.println("Debe elixir tenda");
+			ManexoSQLite.printTendas(con);
+	     	System.out.println("Inserte  numero da tenda");
+	     	int nTendas3=ManexoSQLite.numeroTendas(con);
+	     	String numerotenda3=entrada.nextLine();
+	     	if(Integer.parseInt(numerotenda3)>0 && Integer.parseInt(numerotenda3)<=nTendas3) {
+	     	String nTen3=ManexoSQLite.selectTenda(con,numerotenda3);
+	    	ManexoSQLite.mostrarStock(con,nTen3);
+	     	}else {
+	     		System.out.println("Numero erroneo");
+	     	}
 			break;
 		case 10:
 			ManexoSQLite.eliminarProductoTenda(con);

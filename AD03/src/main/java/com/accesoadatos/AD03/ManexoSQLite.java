@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.Properties;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
@@ -53,7 +54,10 @@ public class ManexoSQLite {
         try
         {
             //Creamos a conexión a base de datos
+            Properties propiedadesConex=new Properties();
+            propiedadesConex.setProperty("foreign_keys", "true");
             connection = DriverManager.getConnection("jdbc:sqlite:" + filename);
+        
             System.out.println("Conexión realizada con éxito");
             return connection;
              
@@ -167,7 +171,6 @@ public class ManexoSQLite {
                     "nome text NOT NULL,\n"+
                     "apelido1 text NOT NULL,\n"+
                     "apelido2 text NOT NULL,\n"+
-                    "tenda text NOT NULL, \n"+
                     "PRIMARY KEY (nome, apelido1,apelido2)"+
                     ");";
 
@@ -325,7 +328,7 @@ public class ManexoSQLite {
  }
  
  /*
- Este método inserta unha nova persoa na taboa Persoa
+ Este método inserta unha nova tenda na taboa Tenda
  */
  public static void anadirTenda(Connection con){
      try{
@@ -412,7 +415,6 @@ public class ManexoSQLite {
      	System.out.println("Inserte  numero do producto");
      	String numeroproducto=entrada.nextLine();
      	String nPro=selectProducto(con,numeroproducto);
-     	if(Integer.parseInt(numeroproducto)>0 && Integer.parseInt(numeroproducto)<=nProductos && Integer.parseInt(numerotenda)>0 && Integer.parseInt(numerotenda)<=nTendas ) {
      	System.out.println("Inserte stock do producto");
      	int stock=entrada.nextInt();
          //Fixate que no código SQL o valor do nome e "?". Este valor engadiremolo despois
@@ -425,9 +427,7 @@ public class ManexoSQLite {
          pstmt.executeUpdate();
 
          System.out.println("Producto engadido con éxito");
-     	}else {
-     		System.out.println("Numero non valido");
-     	}
+
      }
      catch(SQLException e){
          System.out.println(e.getMessage());
@@ -465,7 +465,7 @@ public class ManexoSQLite {
  
  
  /*
- Este método isnerta unha nova persoa na tboa Persoa
+ Este método inserta unha nova persoa na tboa Cliente
  */
  public static void anadirCliente(Connection con){
      try{
@@ -494,21 +494,48 @@ public class ManexoSQLite {
          System.out.println(e.getMessage());
      }
  }
+ 
+ public static void anadirEmpregado(Connection con){
+     try{
+    	 Scanner entrada= new Scanner(System.in);
+     	System.out.println("Inserte  nome do empleado");
+     	String nome=entrada.nextLine();
+     	System.out.println("Inserte apelido 1 do empleado");
+     	String apelido1=entrada.nextLine();
+     	System.out.println("Inserte apelido 2 do empleado");
+     	String apelido2=entrada.nextLine();
+         //Fixate que no código SQL o valor do nome e "?". Este valor engadiremolo despois
+         String sql = "INSERT INTO empregado(nome,apelido1,apelido2) VALUES(?,?,?)";
+         PreparedStatement pstmt = con.prepareStatement(sql);
+
+         //Aquí e cando engadimos o valor do nome
+         pstmt.setString(1, nome);
+         pstmt.setString(2, apelido1);
+         pstmt.setString(3, apelido2);
+         pstmt.executeUpdate();
+         System.out.println("Empregado engadido con éxito");
+     }
+     catch(SQLException e){
+         System.out.println(e.getMessage());
+     }
+ }
  /*
  Este método borra unha tenda da base de datos
  */
  public static void deleteTenda(Connection con){
      try{ 
     	 Scanner entrada= new Scanner(System.in);
-    	 System.out.println("Que tenda desexa eliminar?");
-    	 printTendas(con);
-    	 String nome= entrada.nextLine();
+     	System.out.println("Debe elixir tenda");
+     	printTendas(con);
+      	System.out.println("Inserte  numero da tenda");
+      	int nTendas=numeroTendas(con);
+      	String numerotenda=entrada.nextLine();
+      	String nTen=selectTenda(con,numerotenda);
          String sql = "DELETE FROM tenda WHERE nome = ?";
          PreparedStatement pstmt = con.prepareStatement(sql);
-         pstmt.setString(1, nome);
+         pstmt.setString(1, nTen);
          pstmt.executeUpdate();
          System.out.println("Tenda borrada con éxito");
-         vacumm(con);
      }
      catch(SQLException e){
          System.err.println(e.getMessage());
@@ -521,14 +548,38 @@ public class ManexoSQLite {
  public static void deleteProducto(Connection con){
      try{ 
     	 Scanner entrada= new Scanner(System.in);
-    	 System.out.println("Que tenda desexa eliminar?");
-    	 printProductos(con);
-    	 String nome= entrada.nextLine();
+
+     	System.out.println("Debe elixir un producto");
+     	printProductos(con);
+     	int nProductos=numeroProductos(con);
+      	System.out.println("Inserte  numero do producto");
+      	String numeroproducto=entrada.nextLine();
+      	String nPro=selectProducto(con,numeroproducto);
          String sql = "DELETE FROM producto WHERE nome = ?";
          PreparedStatement pstmt = con.prepareStatement(sql);
-         pstmt.setString(1, nome);
+         pstmt.setString(1, nPro);
          pstmt.executeUpdate();
-         System.out.println("Producto borrada con éxito");
+         System.out.println("Producto borrado con éxito");
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+     }
+ }
+ 
+ public static void deleteEmpregado(Connection con){
+     try{ 
+    	 Scanner entrada= new Scanner(System.in);
+
+     	System.out.println("Debe elixir un empregado");
+     	printEmpregados(con);
+      	System.out.println("Inserte  numero doempregado");
+      	String numeroempregado=entrada.nextLine();
+      	String nPro=selectEmpregado(con,numeroempregado);
+         String sql = "DELETE FROM empregado WHERE nome = ?";
+         PreparedStatement pstmt = con.prepareStatement(sql);
+         pstmt.setString(1, nPro);
+         pstmt.executeUpdate();
+         System.out.println("Empregado borrado con éxito");
      }
      catch(SQLException e){
          System.err.println(e.getMessage());
@@ -536,17 +587,19 @@ public class ManexoSQLite {
  }
  
  /*
- Este método borra unha tenda da base de datos
+ Este método borra un cliente da base de datos
  */
  public static void deleteCliente(Connection con){
      try{ 
     	 Scanner entrada= new Scanner(System.in);
     	 System.out.println("Que cliente desexa eliminar?");
     	 printClientes(con);
-    	 String nome= entrada.nextLine();
-         String sql = "DELETE FROM clientes WHERE nome = ?";
+       	System.out.println("Inserte  numero do cliente");
+    	 String numerocliente=entrada.nextLine();
+    	 String nCli=selectCliente(con,numerocliente);
+         String sql = "DELETE FROM clientes WHERE email = ?";
          PreparedStatement pstmt = con.prepareStatement(sql);
-         pstmt.setString(1, nome);
+         pstmt.setString(1, nCli);
          pstmt.executeUpdate();
          System.out.println("Cliente borrado con éxito");
      }
@@ -656,6 +709,27 @@ public class ManexoSQLite {
      }
  }
  
+ 
+ 
+ public static void printEmpregados(Connection con){
+     try
+     {
+
+         Statement statement = con.createStatement();
+
+         //Probamos a realizar unha consulta
+         ResultSet rs = statement.executeQuery("select rowid,* from empregado");
+         
+         while(rs.next()){
+             //imprimimos o nome de todolas persoas
+             System.out.println(rs.getInt("rowid")+"- Nome = " + rs.getString("nome"));
+         }
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+     }
+ }
+ 
  public static int numeroProductos(Connection con){
      try
      {
@@ -681,6 +755,40 @@ public class ManexoSQLite {
          pstmt.setString(1, rowid);
          ResultSet rs  = pstmt.executeQuery();
          return rs.getString("nome");
+
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+         return null;
+     }
+ }
+ 
+ public static String selectEmpregado(Connection con,String rowid){
+     try
+     {
+         String sql = "select nome from empregado where rowid=?";
+         PreparedStatement pstmt = con.prepareStatement(sql);
+
+         pstmt.setString(1, rowid);
+         ResultSet rs  = pstmt.executeQuery();
+         return rs.getString("nome");
+
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+         return null;
+     }
+ }
+ 
+ public static String selectProductoTenda(Connection con,String rowid){
+     try
+     {
+         String sql = "select nomeproducto from productotenda where rowid=?";
+         PreparedStatement pstmt = con.prepareStatement(sql);
+
+         pstmt.setString(1, rowid);
+         ResultSet rs  = pstmt.executeQuery();
+         return rs.getString("nomeproducto");
 
      }
      catch(SQLException e){
@@ -721,6 +829,38 @@ public class ManexoSQLite {
      }
  }
  
+ public static int numeroClientes(Connection con){
+     try
+     {
+
+         Statement statement = con.createStatement();
+
+         //Probamos a realizar unha consulta
+         ResultSet rs = statement.executeQuery("select count(*) from clientes");
+         return rs.getInt(1);
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+         return 0;
+     }
+ }
+ 
+ public static String selectCliente(Connection con,String rowid){
+     try
+     {
+         String sql = "select email from clientes where rowid=?";
+         PreparedStatement pstmt = con.prepareStatement(sql);
+
+         pstmt.setString(1, rowid);
+         ResultSet rs  = pstmt.executeQuery();
+         return rs.getString("email");
+     }
+     catch(SQLException e){
+         System.err.println(e.getMessage());
+         return null;
+     }
+ }
+ 
  public static void mostrarStock(Connection con,String nometenda){
      try
      {	
@@ -728,18 +868,17 @@ public class ManexoSQLite {
     	 String sql=("select stock from productotenda where nometenda=? and nomeproducto=?");
     	 PreparedStatement pstmt  = con.prepareStatement(sql);
     	 System.out.println("Debe elixir un producto");
-     	printProductos(con);
-     	int nProductos=numeroProductos(con);
+     	printProductosTenda(con,nometenda);
       	System.out.println("Inserte  numero do producto");
       	String numeroproducto=entrada.nextLine();
-      	String nPro=selectProducto(con,numeroproducto);
+      	String nPro=selectProductoTenda(con,numeroproducto);
          // set the value
          pstmt.setString(1,nometenda);
          pstmt.setString(2,nPro);
          ResultSet rs  = pstmt.executeQuery();
-         System.out.println("Tenda "+nometenda+" Producto "+nPro);
+         System.out.println("Tenda "+nometenda);
          while(rs.next()){          
-             System.out.println("stock= " + rs.getString("stock"));
+             System.out.println(" Producto "+nPro+" stock= " + rs.getString("stock"));
          }
 
      }
@@ -754,17 +893,19 @@ public class ManexoSQLite {
     	 Scanner entrada=new Scanner(System.in);
     	 String sql=("UPDATE productotenda SET nometenda = ? ,nomeproducto = ?,stock=? WHERE nometenda =? and nomeproducto=?");
     	 PreparedStatement pstmt  = con.prepareStatement(sql);
-    	 System.out.println("Elixe un producto da tenda");
-    	 printProductosTenda(con,nometenda);
-    	 String nomeproducto=entrada.nextLine();
-    	 System.out.println("Stock actual");
+    	 System.out.println("Debe elixir un producto");
+     	printProductosTenda(con,nometenda);
+      	System.out.println("Inserte  numero do producto");
+      	String numeroproducto=entrada.nextLine();
+      	String nPro=selectProductoTenda(con,numeroproducto);
+    	 System.out.println("Introduce nievo Stock");
     	 int stock=entrada.nextInt();
          // set the value
          pstmt.setString(1,nometenda);
-         pstmt.setString(2,nomeproducto);
+         pstmt.setString(2,nPro);
          pstmt.setInt(3, stock);
          pstmt.setString(4,nometenda);
-         pstmt.setString(5,nomeproducto);
+         pstmt.setString(5,nPro);
          pstmt.executeUpdate();
          System.out.println("Stock do producto actualizado con éxito");
 
@@ -810,11 +951,11 @@ public class ManexoSQLite {
          Statement statement = con.createStatement();
 
          //Probamos a realizar unha consulta
-         ResultSet rs = statement.executeQuery("select * from clientes");
+         ResultSet rs = statement.executeQuery("select rowid,* from clientes");
          
          while(rs.next()){
              //imprimimos o nome de todolas persoas
-             System.out.println("Nome = " + rs.getString("nome"));
+             System.out.println(rs.getInt("rowid")+"- Nome= " + rs.getString("nome")+"- email= " + rs.getString("email"));
          }
      }
      catch(SQLException e){

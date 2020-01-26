@@ -64,8 +64,14 @@ public class Main {
 				"12-Engadir un cliente.\r\n" + 
 				"13-Mostrar os clientes\r\n" + 
 				"14-Eliminar un cliente.\r\n" + 
-				"15-Ler os titulares do periódico El Pais. (Explícase máis abaixo)\r\n" + 
-				"16-Sair da aplicación");
+				"15-Engadir un empregado.\r\n" +
+				"16-Mostrar os empregados da franquicia.\r\n" +
+				"17-Engadir un empregado a unha tenda.\r\n" +
+				"18-Mostrar os empregado dunha tenda\r\n" +
+				"19-Eliminar un empregadoo dunha tenda\r\n" +
+				"20-Eliminar un empregado da franquicia\r\n" +
+				"21-Ler os titulares do periódico El Pais. (Explícase máis abaixo)\r\n" + 
+				"22-Sair da aplicación");
 		
 		eleccion= entrada.nextInt();
 		String salto= entrada.nextLine();
@@ -139,6 +145,21 @@ public class Main {
 			ManexoSQLite.deleteCliente(con);
 			break;
 		case 15:
+			ManexoSQLite.anadirEmpregado(con);
+			break;
+		case 16:
+			ManexoSQLite.printEmpregados(con);
+			break;
+		case 17:
+			break;
+		case 18:
+			break;
+		case 19:
+			break;
+		case 20:
+			ManexoSQLite.deleteEmpregado(con);
+			break;
+		case 21:
 			 XMLReader procesadorXML = null;
 			 
 			 try {
@@ -166,14 +187,14 @@ public class Main {
 		            System.out.println("Ocurriu un erro ao ler o arquivo XML");
 		        }
 			break;
-		case 16:
+		case 22:
 			ManexoSQLite.desconnetDatabase(con);
 			System.exit(0);
 			break;
 		default:
 			break;
 		}
-		}while(eleccion!=16);
+		}while(eleccion!=22);
 		
 	}
 	
